@@ -80,7 +80,7 @@ with st.sidebar:
         st.write("No history found.")
 
 # App main title
-st.title("GenAI Video Script Generator")
+st.title("Video Script Writer")
 
 # User Inputs
 topic = st.text_input("Enter the Topic :")

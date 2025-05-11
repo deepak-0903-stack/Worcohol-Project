@@ -1,6 +1,6 @@
-# GenAI Video Script Generator
+# Video Script Writer
 
-*GenAI Video Script Generator* is a Streamlit-based AI application that creates scene-based video scripts using Google Gemini (Generative AI). Users can generate engaging video scripts for YouTube, Shorts, LinkedIn, or Podcasts, using content from YouTube transcripts or Wikipedia.
+*Video Script Writer* is a Streamlit-based AI application that creates scene-based video scripts using Google Gemini (Generative AI). Users can generate engaging video scripts for YouTube, Shorts, LinkedIn, or Podcasts, using content from YouTube transcripts or Wikipedia.
 
 ---
 

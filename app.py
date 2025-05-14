@@ -13,42 +13,6 @@ if not GOOGLE_API_KEY:
     raise ValueError("Google API key not found in .env file.")
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# Theme Styling
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background: linear-gradient(to right, #1f1c2c, #928dab);
-        background-attachment: fixed;
-        background-size: cover;
-        color: white;
-    }
-
-    /* Input fields */
-    .stTextArea, .stSelectbox, .stTextInput {
-        background-color: #2c2f48 !important;
-        color: white !important;
-        border-radius: 6px;
-    }
-
-    /* Fix label visibility */
-    label, .css-1cpxqw2, .css-qrbaxs, .css-81oif8 {
-        color: white !important;
-    }
-
-    /* Buttons */
-    .stButton > button {
-        background-color: #6a11cb;
-        color: white;
-        font-weight: bold;
-        border-radius: 8px;
-        border: none;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Initialize session history
 if "previous_scripts" not in st.session_state:
     st.session_state.previous_scripts = []
@@ -94,55 +58,53 @@ def build_prompt(topic, info, format, vibe):
     format_guidelines = {
         "YouTube": {
             "length": "4–10 minutes",
-            "max_scenes": 9,
             "tone": "Informative and engaging",
-            "style": "Start with a compelling intro, include 5–9 clearly labeled SCENES with timestamps, visual storytelling, and end with a strong outro"
+            "style": "Use engaging narrative with a mix of on-screen actions, host dialogue, and creative transitions. Include clear formatting like [INTRO:], [CUT TO:], [Host:], etc."
         },
         "Instagram Reel/Youtube Shorts": {
             "length": "30–60 seconds",
-            "max_scenes": 3,
             "tone": "Fast-paced, fun, Gen-Z-friendly",
-            "style": "Start with a hook in the first 3 seconds, keep it visual and punchy, use 2–3 quick SCENES (each scene should be maximum 10–15 seconds only), minimal narration, emojis and Gen-Z language encouraged"
+            "style": "Use short, punchy lines with visual cues like [HOOK:], [CUT TO:], [TEXT ON SCREEN:], [Host:], etc. Keep language upbeat and visuals dynamic"
         },
         "Linkedin Video": {
             "length": "1–2 minutes",
-            "max_scenes": 3,
             "tone": "Professional and insightful",
-            "style": "Short intro (0–10 seconds), focus on 2–3 value-driven SCENES (each scene should be maximum 15–20 seconds only), data and industry language encouraged, end with a reflective outro"
+            "style": "Use [INTRO:], [Host:], [CUT TO DATA:], [OUTRO:] formatting. Keep it tight, focused, and data-driven with clear takeaways."
         },
         "Podcast": {
             "length": "5–15 minutes",
-            "max_scenes": 5,
             "tone": "Conversational and informative",
-            "style": "Natural dialogue style, start with a warm welcome, 3–5 topic-based sections, use real-world examples, end with a reflective outro or teaser"
+            "style": "Use paragraph format with speaker turns marked as [Host:], [Guest:], etc. No visual directions. Focus on smooth natural flow."
         }
     }
 
     guide = format_guidelines.get(format, format_guidelines["YouTube"])
     return f"""
-You're a creative, informative and professional video script writer.
+You're a professional and creative video script writer.
 
-Write a scene-based video script based on this topic: "{topic}".  
-Use this factual content as reference: \n\n{info}\n\n
+Write a video script for the topic: "{topic}", using the following reference content:\n\n{info}\n\n
 
 ### Script Constraints:
 - Platform: {format}
-- Estimated Duration: {guide['length']} (must stay within this range)
-- Max Scenes: {guide['max_scenes']} scenes total (including intro & outro)
+- Length: {guide['length']}
 - Tone: {guide['tone']}
-- Style: {guide['style']}
+- Style Guidelines: {guide['style']}
 - Vibe: {vibe}
 
-### Instructions:
-- Follow strict video length, tone, for their respective video format 
-- Start with an attractive intro and greeting before any scene begins (no creator name). Briefly tease what the video is about
-- Include clearly labeled SCENES or SECTIONS
-- Use rich visual descriptions, real-world analogies, and relatable narration
-- Keep the tone {vibe.lower()}, simple, and suited for {format}
-- End with a natural outro that encourages viewers to engage
+### Output Format Instructions:
+- Write the video script which is best suitable for {format} , u can change the format of the output based on the {format}
+- Format the script using stage directions and camera cues like: [INTRO:], [TRANSITION:], [CUT TO:], [Host:], etc.
+- Begin with an attention-grabbing intro with music or visual elements
+- Write natural host dialogue with personality and energy
+- Use paragraph-style storytelling with embedded visual/audio suggestions
+- Use creative transitions and descriptions of visuals or sound effects
+- Conclude with a clear, engaging outro and CTA suited for {format}
+- Do not use scene numbers or timestamps
+- Keep the script flowing like a real video shoot, not a scene-based breakdown
 
-Only return the formatted scene-based script. Don't explain your choices.
+Return only the formatted video script in the described style. Do not add commentary or explanations.
 """
+
 
 # Content Fetchers
 def get_youtube_transcript(url):
@@ -191,8 +153,8 @@ if generate_button:
                     "script": script
                 })
 
-                st.subheader("Generated Video Script")
-                st.text_area("Scene-Based Script", script, height=1000, key="script_output")
+                st.subheader(f"Generated Video Script for: {topic}")
+                st.text_area("Video Script", script, height=1000, key="script_output")
                 st.download_button("Download Script", script, file_name=f"{topic}_scene_script.txt")
                 st.code(script, language="markdown")
 

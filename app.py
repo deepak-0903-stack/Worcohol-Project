@@ -1,10 +1,7 @@
 import os
 import streamlit as st
-from youtube_transcript_api import YouTubeTranscriptApi
-from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
 from google import genai
-import wikipedia
 
 # Load API key
 load_dotenv()
@@ -34,7 +31,7 @@ with st.sidebar:
     st.subheader("Previous Scripts")
     if st.session_state.previous_scripts:
         options = [
-            f"{i+1}. {entry['topic']} ({entry['source']}, {entry['format']}, {entry['vibe']})"
+            f"{i+1}. {entry['topic']} ({entry['format']}, {entry['vibe']})"
             for i, entry in enumerate(st.session_state.previous_scripts)
         ]
         selected_index = st.selectbox("Select version to view:", options)
@@ -48,13 +45,12 @@ st.title("Video Script Writer :clapper:")
 
 # User Inputs
 topic = st.text_input("Enter the Topic :")
-source = st.selectbox("Select content source:", ["YouTube", "Wikipedia"])
 format = st.selectbox("Select video format:", ["YouTube", "Instagram Reel/Youtube Shorts", "Linkedin Video", "Podcast"])
 vibe = st.selectbox("Select vibe of the Video:", ["Casual", "Professional", "Funny", "Creative", "Informative"])
 generate_button = st.button("Generate Script")
 
 # Prompt Builder
-def build_prompt(topic, info, format, vibe):
+def build_prompt(topic, format, vibe):
     format_guidelines = {
         "YouTube": {
             "length": "4–10 minutes",
@@ -78,11 +74,11 @@ def build_prompt(topic, info, format, vibe):
         }
     }
 
-    guide = format_guidelines.get(format, format_guidelines["YouTube"])
+    guide = format_guidelines[format]
     return f"""
 You're a professional and creative video script writer.
 
-Write a video script for the topic: "{topic}" using the reference content below:\n\n{info}\n\n
+Write a video script for the topic: "{topic}"
 
 ### Script Constraints:
 - Platform: {format}
@@ -92,29 +88,14 @@ Write a video script for the topic: "{topic}" using the reference content below:
 - Vibe: {vibe}
 
 ### Output Format Instructions:
-- Start with a hook or intro
-- Use [Host: or Me:], [Cut to:], [Transition:], etc.
+- Start with a proper greeting, hook/intro
+- Use [Host:], [Cut to:], [Transition:], etc.
 - Keep it structured and suitable for {format}
+- Ensure the script is written in grammatically correct English
 - No timestamps or scene numbers
 - Return only the script in a clean format 
-- donot include any organization or persons name in entire script
+- donot mention any real names, brands, platform and companies in the entire script
 """
-
-# YouTube and Wikipedia Fetch
-def get_youtube_transcript(url):
-    try:
-        video_id = parse_qs(urlparse(url).query)["v"][0]
-        transcript = YouTubeTranscriptApi.get_transcript(video_id)
-        return " ".join([entry["text"] for entry in transcript])[:3000]
-    except Exception as e:
-        return f"(Couldn't fetch YouTube transcript: {e})"
-
-def get_wikipedia_summary(topic):
-    try:
-        wikipedia.set_lang("en")
-        return wikipedia.summary(topic, sentences=10)
-    except Exception as e:
-        return f"(Couldn't fetch Wikipedia summary: {e})"
 
 # Generate Script
 if generate_button:
@@ -123,8 +104,7 @@ if generate_button:
     else:
         with st.spinner("Generating your script..."):
             try:
-                info = get_youtube_transcript(topic) if source == "YouTube" else get_wikipedia_summary(topic)
-                prompt = build_prompt(topic, info, format, vibe)
+                prompt = build_prompt(topic, format, vibe)
 
                 response = client.models.generate_content(
                     model="gemini-2.0-flash",
@@ -135,7 +115,6 @@ if generate_button:
 
                 st.session_state.previous_scripts.append({
                     "topic": topic,
-                    "source": source,
                     "format": format,
                     "vibe": vibe,
                     "script": script

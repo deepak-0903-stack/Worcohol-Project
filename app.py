@@ -21,11 +21,14 @@ with st.sidebar:
     with st.expander("User Guide"):
         st.markdown("""
         1. Enter a topic (e.g., "Artificial Intelligence")
-        2. Choose YouTube or Wikipedia as the source
-        3. Select video format: YouTube, Shorts, LinkedIn, or Podcast
-        4. Select vibe: Casual, Professional, etc.
-        5. Click "Generate Script"
-        6. Your scripts are saved below in the Previous Scripts section
+        2. Select video format: YouTube, Shorts, LinkedIn, or Podcast
+        3. Select vibe: Casual, Professional, etc.
+        4. Select Viewers Type: General, student, Experts, Kids, etc
+        5. Select Output Style: Full Script, Bullet Point, Summary, etc 
+        6. Select Duration ,Select in Seconds
+        7. Select language: English, Spanish, Hindi, etc                                    
+        8. Click "Generate Script"
+        9. Your scripts are saved below in the Previous Scripts section
         """)
 
     st.subheader("Previous Scripts")
@@ -47,54 +50,102 @@ st.title("Video Script Writer :clapper:")
 topic = st.text_input("Enter the Topic :")
 format = st.selectbox("Select video format:", ["YouTube", "Instagram Reel/Youtube Shorts", "Linkedin Video", "Podcast"])
 vibe = st.selectbox("Select vibe of the Video:", ["Casual", "Professional", "Funny", "Creative", "Informative"])
+viewer_type = st.selectbox("Who is the viewer of this Scipt/Video ", ["General", "Students", "Beginners", "Experts", "Kids"])
+output_style = st.selectbox("Select Output Style", ["Full Script", "Bullet Points", "Summary", "Storyboard", "podcast Outline"])
+duration = st.slider("Select video duration (in seconds)", min_value=15, max_value=780, step=15, value=60)
+language = st.selectbox("Select Language", ["English", "Hindi", "Spanish", "French", "German"])
 generate_button = st.button("Generate Script")
 
 # Prompt Builder
-def build_prompt(topic, format, vibe):
-    format_guidelines = {
-        "YouTube": {
-            "length": "4–10 minutes",
-            "tone": "Informative and engaging",
-            "style": "Use engaging narrative with a mix of on-screen actions, host dialogue, and creative transitions."
-        },
-        "Instagram Reel/Youtube Shorts": {
-            "length": "30–60 seconds",
-            "tone": "Fast-paced, fun, Gen-Z-friendly",
-            "style": "Use short, punchy lines with visual cues. Keep it upbeat and dynamic."
-        },
-        "Linkedin Video": {
-            "length": "1–2 minutes",
-            "tone": "Professional and insightful",
-            "style": "Tight, focused, data-driven with clear takeaways."
-        },
-        "Podcast": {
-            "length": "5–15 minutes",
-            "tone": "Conversational and informative",
-            "style": "Speaker turns like [Host:], [Guest:]. No visuals, smooth flow."
-        }
-    }
+def get_output_style_guidelines(output_style, format):
+    if output_style == "Full Script":
+        if format == "Podcast":
+            return """
+Write a complete podcast script using speaker labels.
 
-    guide = format_guidelines[format]
+- Use [HOST:] and [GUEST:] to alternate dialogues.
+- Donot include any specific names of persons, channels, and organization
+- Include an engaging intro, multiple discussion segments, and a closing.
+- Maintain a conversational flow suited for audio-only format.
+- Avoid any visual references or screen directions.
+- Keep it engaging and informative, strictly in the selected tone.
+"""
+        else:
+            return """
+Write a complete word-for-word script suitable for the selected format.
+
+- Use markers like [HOST:], [TEXT ON SCREEN:], [CUT TO:], etc.
+- No timestamps or scene numbers.
+- Follow a logical structure: Hook → Content → CTA → End.
+- Make the script clean, structured, and ready to use.
+"""
+    elif output_style == "Bullet Points":
+        return """
+Present the core ideas as concise bullet points.
+
+- Each point should capture one concept or idea.
+- Structure logically: intro → key points → wrap-up.
+- Avoid full sentences or paragraph-style writing.
+- Ideal for summarizing script flow or key moments.
+"""
+    elif output_style == "Storyboard":
+        return """
+Structure the content as a storyboard, broken down into scenes.
+
+Each scene should include:
+- Scene #: Number each sequentially.
+- [VISUAL]: Describe the visual elements.
+- [VOICEOVER]: Narration or speech.
+- [TEXT ON SCREEN]: Any written text appearing.
+- Ensure clarity and visual planning throughout.
+"""
+    elif output_style == "Podcast Outline":
+        return """
+Create a high-level outline for a podcast episode.
+
+Include:
+- Episode Title
+- Estimated Duration
+- Segment structure like: [HOST INTRO], [HOOK], [SEGMENT 1], [GUEST INPUT], [SEGMENT 2], [RECAP], [CTA], [OUTRO]
+- Use bullet points to briefly describe content for each section.
+- Alternate speaker tags where possible.
+"""
+    elif output_style == "Summary":
+        return """
+Write a short, 3–6 sentence summary.
+
+- Explain the topic clearly and concisely.
+- Include the main message and importance.
+- Maintain alignment with tone, viewer type, and language.
+- No bullet points or formatting tags. Just clean, structured text.
+"""
+    else:
+        return "Follow professional, concise formatting for the selected style."
+
+
+def build_prompt(topic, format, vibe, viewer_type, output_style, language, duration):
+    minutes = duration // 60
+    seconds = duration % 60
+    formatted_duration = f"{minutes} minutes" if seconds == 0 else f"{minutes} minutes {seconds} seconds"
+
+    style_guidelines = get_output_style_guidelines(output_style, format)
+
     return f"""
-You're a professional and creative video script writer.
+You are an expert video content writer and script generator.
 
-Write a video script for the topic: "{topic}"
+Generate a *{output_style}* for a *{format}* video on the topic: *"{topic}"*
 
-### Script Constraints:
-- Platform: {format}
-- Length: {guide['length']}
-- Tone: {guide['tone']}
-- Style Guidelines: {guide['style']}
-- Vibe: {vibe}
+Strict Guidelines to Follow:
+- *Tone/Vibe*: {vibe}
+- *Viewer Type*: {viewer_type}
+- *Language*: {language}
+- *Target Duration*: {formatted_duration}
+- *Do NOT include any specific names of people, companies, or brands* in the entire script.
 
-### Output Format Instructions:
-- Start with a proper greeting, hook/intro
-- Use [Host:], [Cut to:], [Transition:], etc.
-- Keep it structured and suitable for {format}
-- Ensure the script is written in grammatically correct English
-- No timestamps or scene numbers
-- Return only the script in a clean format 
-- donot mention any real names, brands, platform and companies in the entire script
+### Output Formatting Instructions:
+{style_guidelines}
+
+Only return the content as per the structure — do not include commentary, explanation, or markdown formatting.
 """
 
 # Generate Script
@@ -104,7 +155,7 @@ if generate_button:
     else:
         with st.spinner("Generating your script..."):
             try:
-                prompt = build_prompt(topic, format, vibe)
+                prompt = build_prompt(topic, format, vibe, viewer_type, output_style, language, duration)
 
                 response = client.models.generate_content(
                     model="gemini-2.0-flash",

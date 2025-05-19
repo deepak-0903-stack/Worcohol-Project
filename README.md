@@ -6,12 +6,48 @@ Video Script Writer is a Streamlit-based AI application that creates an automate
 
 ## Features
 
-- AI-Powered Script Generation using Google Gemini
-- Supports Various Formats: YouTube, Instagram Reels, LinkedIn, Podcast
-- Scene-Based Output: Includes intro, labeled scenes, and outro
-- Vibe Options: Casual, Professional, Funny, Creative, Informative
-- Previous Script History in-app
-- Script Download Option as .txt
+### 1. Multi-Platform Script Generation
+Generate video scripts tailored to specific platforms:
+- *YouTube*
+- *Instagram Reels / YouTube Shorts*
+- *LinkedIn Videos*
+- *Podcasts*
+
+### 2. Multiple Output Styles
+Choose how you want your script delivered:
+- *Full Script*: Complete narrative with directions and flow
+- *Bullet Points*: Key talking points in a summarized format
+- *Storyboard*: Visual layout with scene-by-scene breakdown
+- *Podcast Outline*: Speaker turns and segments formatted for audio
+- *Summary*: Concise 3–6 sentence wrap-up of the topic
+
+### 3. Customizable Tone and Viewer Type
+- Select the *tone/vibe*: Casual, Professional, Funny, Creative, Informative
+- Choose the *viewer type*: Students, Professionals, Kids, Beginners, Experts, General audience
+
+### 4. Language Support
+Generate content in multiple languages:
+- English
+- Hindi
+- Spanish
+- French
+- German
+
+### 5. Duration Control
+Specify your video’s duration in seconds — the script adapts accordingly.
+
+### 6. Neutral, Reusable Output
+- *No specific names* of people, companies, or brands are used.
+- Clean, reusable scripts for any purpose.
+
+### 7. Script History & Export
+- View previously generated scripts within the app
+- Download scripts as .txt files
+
+### 8. Streamlit-Powered UI
+- Simple, interactive frontend
+- Live script generation using Google Gemini API
+-
 
 ---
 

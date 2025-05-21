@@ -51,9 +51,9 @@ topic = st.text_input("Enter the Topic :")
 format = st.selectbox("Select video format:", ["YouTube", "Instagram Reel/Youtube Shorts", "Linkedin Video", "Podcast"])
 vibe = st.selectbox("Select vibe of the Video:", ["Casual", "Professional", "Funny", "Creative", "Informative"])
 viewer_type = st.selectbox("Who is the viewer of this Scipt/Video ", ["General", "Students", "Beginners", "Experts", "Kids"])
-output_style = st.selectbox("Select Output Style", ["Full Script", "Bullet Points", "Summary", "Storyboard", "podcast Outline"])
+output_style = st.selectbox("Select Output Style", ["Full Script", "Summary", "Storyboard", "podcast Outline"])
 duration = st.slider("Select video duration (in seconds)", min_value=15, max_value=780, step=15, value=60)
-language = st.selectbox("Select Language", ["English", "Hindi", "Spanish", "French", "German"])
+language = st.selectbox("Select Language", ["English", "Hindi", "Telugu", "Spanish", "French", "German"])
 generate_button = st.button("Generate Script")
 
 # Prompt Builder
@@ -74,19 +74,10 @@ Write a complete podcast script using speaker labels.
             return """
 Write a complete word-for-word script suitable for the selected format.
 
-- Use markers like [HOST:], [TEXT ON SCREEN:], [CUT TO:], etc.
+- Use markers like [HOST:], [TEXT ON SCREEN:],[TRANSITION:], [CUT TO:], etc.
 - No timestamps or scene numbers.
-- Follow a logical structure: Hook → Content → CTA → End.
+- Follow a logical structure
 - Make the script clean, structured, and ready to use.
-"""
-    elif output_style == "Bullet Points":
-        return """
-Present the core ideas as concise bullet points.
-
-- Each point should capture one concept or idea.
-- Structure logically: intro → key points → wrap-up.
-- Avoid full sentences or paragraph-style writing.
-- Ideal for summarizing script flow or key moments.
 """
     elif output_style == "Storyboard":
         return """
@@ -112,7 +103,7 @@ Include:
 """
     elif output_style == "Summary":
         return """
-Write a short, 3–6 sentence summary.
+Write a lenghty, informative, 6-8 paragraph summary.
 
 - Explain the topic clearly and concisely.
 - Include the main message and importance.
@@ -130,6 +121,23 @@ def build_prompt(topic, format, vibe, viewer_type, output_style, language, durat
 
     style_guidelines = get_output_style_guidelines(output_style, format)
 
+    # Language-specific instructions
+    if language.lower() == "hindi":
+        language_instruction = "Hindi — strictly use Hindi script"
+        language_note = """
+### Language Note:
+Ensure the script is written entirely in Hindi script . Do NOT use transliterated Roman Hindi like 'Namaste dosto'.
+"""
+    elif language.lower() == "telugu":
+        language_instruction = "Telugu — strictly use Telugu script "
+        language_note = """
+### Language Note:
+Ensure the script is written entirely in Telugu script. Do NOT use transliterated Roman Telugu like 'Meeru Ela Unnaru'.
+"""
+    else:
+        language_instruction = language
+        language_note = ""
+
     return f"""
 You are an expert video content writer and script generator.
 
@@ -138,15 +146,17 @@ Generate a *{output_style}* for a *{format}* video on the topic: *"{topic}"*
 Strict Guidelines to Follow:
 - *Tone/Vibe*: {vibe}
 - *Viewer Type*: {viewer_type}
-- *Language*: {language}
+- *Language*: {language_instruction}
 - *Target Duration*: {formatted_duration}
 - *Do NOT include any specific names of people, companies, or brands* in the entire script.
 
 ### Output Formatting Instructions:
 {style_guidelines}
+{language_note}
 
 Only return the content as per the structure — do not include commentary, explanation, or markdown formatting.
 """
+
 
 # Generate Script
 if generate_button:

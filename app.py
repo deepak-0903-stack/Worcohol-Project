@@ -3,18 +3,15 @@ import streamlit as st
 from dotenv import load_dotenv
 from google import genai
 
-# Load API key
 load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("Google API key not found.")
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
-# Initialize session history
 if "previous_scripts" not in st.session_state:
     st.session_state.previous_scripts = []
 
-# Sidebar
 with st.sidebar:
     st.header("Settings & History")
 
@@ -43,10 +40,8 @@ with st.sidebar:
     else:
         st.write("No history found.")
 
-# Title
 st.title("Video Script Writer :clapper:")
 
-# User Inputs
 topic = st.text_input("Enter the Topic :")
 format = st.selectbox("Select video format:", ["YouTube", "Instagram Reel/Youtube Shorts", "Linkedin Video", "Podcast"])
 vibe = st.selectbox("Select vibe of the Video:", ["Casual", "Professional", "Funny", "Creative", "Informative"])
@@ -56,7 +51,6 @@ duration = st.slider("Select video duration (in seconds)", min_value=15, max_val
 language = st.selectbox("Select Language", ["English", "Hindi", "Telugu", "Spanish", "French", "German"])
 generate_button = st.button("Generate Script")
 
-# Prompt Builder
 def get_output_style_guidelines(output_style, format):
     if output_style == "Full Script":
         if format == "Podcast":
@@ -121,7 +115,6 @@ def build_prompt(topic, format, vibe, viewer_type, output_style, language, durat
 
     style_guidelines = get_output_style_guidelines(output_style, format)
 
-    # Language-specific instructions
     if language.lower() == "hindi":
         language_instruction = "Hindi — strictly use Hindi script"
         language_note = """
@@ -158,7 +151,6 @@ Only return the content as per the structure — do not include commentary, expl
 """
 
 
-# Generate Script
 if generate_button:
     if not topic:
         st.warning("Please enter a valid topic.")

@@ -16,19 +16,19 @@ Generate video scripts tailored to specific platforms:
 ### 2. Multiple Output Styles
 Choose how you want your script delivered:
 - *Full Script*: Complete narrative with directions and flow
-- *Bullet Points*: Key talking points in a summarized format
 - *Storyboard*: Visual layout with scene-by-scene breakdown
 - *Podcast Outline*: Speaker turns and segments formatted for audio
 - *Summary*: Concise 3–6 sentence wrap-up of the topic
 
 ### 3. Customizable Tone and Viewer Type
 - Select the *tone/vibe*: Casual, Professional, Funny, Creative, Informative
-- Choose the *viewer type*: Students, Professionals, Kids, Beginners, Experts, General audience
+- Choose the *viewer type*: Students, Professionals, Kids, Beginners, Experts
 
 ### 4. Language Support
 Generate content in multiple languages:
 - English
 - Hindi
+- Telugu
 - Spanish
 - French
 - German
